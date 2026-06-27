@@ -10,8 +10,8 @@ const ANCHO = 42; // Ancho del ticket en caracteres
 /**
  * Consulta la URL y, si la respuesta indica impresión, ejecuta la impresión.
  */
-
-const CAFETERIA_NOMBRE = "Cafetería Distrito Urbano";
+const EMPRESA = "   DISTRITO URBANO   ";
+const CAFETERIA_NOMBRE = "Velora Cafetería";
 
 async function poll() {
     if (isPrinting) {
@@ -53,7 +53,7 @@ async function poll() {
         // Agrupar por mesa
         const grupos = {};
         data.forEach(row => {
-            const mesa = row.mesa;
+            const mesa = row.mesa_nombre;
             if (!grupos[mesa]) {
                 grupos[mesa] = {
                     items: [],
@@ -117,7 +117,7 @@ function generarTicket(mesa, items, pedidosIds) {
         subtotal += valor;
         // Nombre: máximo 22 caracteres, precio: 10 caracteres (incluyendo signo $)
         const nombre = item.receta.substring(0, 22).padEnd(22, ' ');
-        const precioStr = `$${valor}`.padStart(16, ' ');
+        const precioStr = `$${valor}`.padStart(18, ' ');
         lineasItems.push(`${nombre}${precioStr}`);
     });
 
@@ -126,8 +126,13 @@ function generarTicket(mesa, items, pedidosIds) {
 
     const lineaSeparadora = '─'.repeat(ANCHO);
 
+    const lineaSeparadora2 = '='.repeat(ANCHO);
+
     // Construir ticket
     let ticket = '';
+    ticket += lineaSeparadora2 + '\n';
+    ticket += centrar(EMPRESA) + '\n';
+    ticket += lineaSeparadora2 + '\n';
     ticket += centrar(CAFETERIA_NOMBRE) + '\n';
     ticket += centrar(`Orden: ${mesa}`) + '\n';
     // Añadir línea con IDs de pedido (N: ...)
