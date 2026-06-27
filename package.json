@@ -1,0 +1,23 @@
+{
+  "name": "imprimir-etiquetas",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "node-thermal-printer": "^4.6.0",
+    "pdf-to-printer": "^5.8.0",
+    "printer": "^0.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "keywords": [],
+  "description": ""
+}
