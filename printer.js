@@ -11,14 +11,14 @@ async function printTicket(content) {
     const printer = new ThermalPrinter({
       type: PrinterTypes.EPSON,
       interface: 'none',
-      encoding: config.encoding
+      encoding: config.encoding || 'GB18030'
     });
 
     printer.clear();
     printer.alignCenter();
     // Puedes personalizar el encabezado fijo
     printer.println("================================");
-    printer.println("   DISTRITO URBANO APP");
+    printer.println("   DISTRITO URBANO   ");
     printer.println("================================");
     printer.println(content);
     printer.cut();

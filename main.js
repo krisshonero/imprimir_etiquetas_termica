@@ -6,7 +6,7 @@ const {
 
 let isPrinting = false; // Evita solapamiento de impresiones
 let shouldPrint = false
-const ANCHO = 32; // Ancho del ticket en caracteres
+const ANCHO = 42; // Ancho del ticket en caracteres
 /**
  * Consulta la URL y, si la respuesta indica impresión, ejecuta la impresión.
  */
@@ -77,17 +77,6 @@ async function poll() {
         }
 
         isPrinting = false;
-
-        /*const content = "Hola!!!"
-
-        if (shouldPrint) {
-            isPrinting = true;
-            console.log(`📨 Recibida orden de impresión. Contenido: ${content.substring(0, 50)}...`);
-            await printTicket(content);
-            isPrinting = false;
-        } else {
-            console.log("⏭️ No hay órdenes de impresión pendientes.");
-        }*/
     } catch (error) {
         console.error("❌ Error en el polling:", error.message);
         // Si la URL no responde, podrías reintentar después sin detener el servicio
@@ -128,7 +117,7 @@ function generarTicket(mesa, items, pedidosIds) {
         subtotal += valor;
         // Nombre: máximo 22 caracteres, precio: 10 caracteres (incluyendo signo $)
         const nombre = item.receta.substring(0, 22).padEnd(22, ' ');
-        const precioStr = `$${valor}`.padStart(10, ' ');
+        const precioStr = `$${valor}`.padStart(16, ' ');
         lineasItems.push(`${nombre}${precioStr}`);
     });
 
@@ -141,12 +130,13 @@ function generarTicket(mesa, items, pedidosIds) {
     let ticket = '';
     ticket += centrar(CAFETERIA_NOMBRE) + '\n';
     ticket += centrar(`Orden: ${mesa}`) + '\n';
-    ticket += centrar(`Fecha: ${fecha}`) + '\n';
     // Añadir línea con IDs de pedido (N: ...)
     if (pedidosIds && pedidosIds.length > 0) {
         const idsStr = pedidosIds.join(', ');
         ticket += centrar(`N: ${idsStr}`) + '\n';
     }
+    ticket += centrar(`Fecha: ${fecha}`) + '\n';
+    
     ticket += lineaSeparadora + '\n';
 
     // Items
