@@ -20,28 +20,147 @@ async function poll() {
     }
 
     try {
-        console.log(`🔄 Consultando ${config.pollingUrl} ...`);
-        const resp = await axios.post(config.pollingUrl, {
+        // 1. Obtener los tickets activos (mesas con pedidos a imprimir)
+        console.log(`🔄 Consultando ${config.cliente_mesas_ticket_obtener} ...`);
+        const respTicket = await axios.post(config.cliente_mesas_ticket_obtener, {
             in_sucursal: 'velora'
         }, {
-            timeout: 10000 // 10 segundos
+            timeout: 10000
         });
 
-        if (resp.data.res_status == 'E') throw new Error('error al consultar URL ' + resp.data.message)
-        if (resp.data.res_status == 'S' && resp.data.message == 'no_existen_registros') {
-            shouldPrint = false
-        } else {
-            shouldPrint = true
+        if (respTicket.data.res_status === 'E') {
+            throw new Error('Error al consultar tickets: ' + respTicket.data.message);
         }
+
+        // Si no hay tickets, no imprimir nada
+        if (respTicket.data.res_status === 'S' && respTicket.data.message === 'no_existen_registros') {
+            console.log("⏭️ No hay tickets pendientes.");
+            return;
+        }
+
+        // Construir mapa: mesa -> Set de id_pedido permitidos
+        const pedidosPermitidosPorMesa = {};
+        respTicket.data.data.forEach(record => {
+            const mesa = record.mesa; // identificador de la mesa
+            const pedidosStr = record.pedidos; // string con IDs separados por coma
+            if (!pedidosStr) return;
+
+            // Convertir el string a array de números
+            const ids = pedidosStr.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
+            if (ids.length === 0) return;
+
+            if (!pedidosPermitidosPorMesa[mesa]) {
+                pedidosPermitidosPorMesa[mesa] = new Set();
+            }
+            ids.forEach(id => pedidosPermitidosPorMesa[mesa].add(id));
+        });
+
+        // 2. Obtener los datos de impresión (mesas con imprimir=1)
+        console.log(`🔄 Consultando ${config.cliente_mesas_imprimir_obtener} ...`);
+        const resp = await axios.post(config.cliente_mesas_imprimir_obtener, {
+            in_sucursal: 'velora'
+        }, {
+            timeout: 10000
+        });
 
         if (resp.data.res_status === 'E') {
             throw new Error('Error al consultar URL: ' + resp.data.message);
         }
 
-        // Si no hay registros, no imprimir
         if (resp.data.res_status === 'S' && resp.data.message === 'no_existen_registros') {
             console.log("⏭️ No hay órdenes de impresión pendientes.");
             return;
+        }
+
+        const data = resp.data.data;
+        if (!data || data.length === 0) {
+            console.log("⏭️ Datos vacíos, no se imprime.");
+            return;
+        }
+
+        // 3. Filtrar los datos: solo mantener los id_pedido que están en los tickets
+        const dataFiltrada = data.filter(row => {
+            const mesa = row.mesa; // identificador de la mesa
+            const idPedido = row.id_pedido;
+            // Verificar si la mesa tiene ticket y si el id_pedido está en el Set
+            return pedidosPermitidosPorMesa[mesa] && pedidosPermitidosPorMesa[mesa].has(idPedido);
+        });
+
+        if (dataFiltrada.length === 0) {
+            console.log("⏭️ Después de filtrar, no quedan items para imprimir.");
+            return;
+        }
+
+        // 4. Agrupar por mesa (usando mesa_nombre para mostrar en el ticket)
+        const grupos = {};
+        dataFiltrada.forEach(row => {
+            const mesaNombre = row.mesa_nombre || row.mesa; // fallback al identificador si falta nombre
+            if (!grupos[mesaNombre]) {
+                grupos[mesaNombre] = {
+                    items: [],
+                    pedidos: new Set()
+                };
+            }
+            grupos[mesaNombre].items.push(row);
+            if (row.id_pedido) {
+                grupos[mesaNombre].pedidos.add(row.id_pedido);
+            }
+        });
+
+        isPrinting = true;
+        console.log(`📨 Recibida orden de impresión. ${Object.keys(grupos).length} mesa(s) con items.`);
+
+        // 5. Generar y enviar un ticket por cada mesa
+        for (const [mesaNombre, grupo] of Object.entries(grupos)) {
+            const pedidosIds = Array.from(grupo.pedidos).sort((a, b) => a - b);
+            const ticketContent = generarTicket(mesaNombre, grupo.items, pedidosIds);
+            console.log(`🖨️ Imprimiendo ticket para mesa: ${mesaNombre} (${grupo.items.length} items, ${pedidosIds.length} pedido(s))`);
+            await printTicket(ticketContent);
+        }
+
+        isPrinting = false;
+
+    } catch (error) {
+        console.error("❌ Error en el polling:", error.message);
+        isPrinting = false; // Asegurar que se libere el flag
+    }
+}
+
+async function poll_old() {
+    if (isPrinting) {
+        console.log("⏳ Impresión en curso, se omite esta iteración.");
+        return;
+    }
+
+    try {
+        console.log(`🔄 Consultando ${config.cliente_mesas_ticket_obtener} ...`);
+        const resp1 = await axios.post(config.cliente_mesas_ticket_obtener, {
+            in_sucursal: 'velora'
+        }, {
+            timeout: 10000 // 10 segundos
+        });
+        console.log(`🔄 Consultando ${config.cliente_mesas_imprimir_obtener} ...`);
+        const resp = await axios.post(config.cliente_mesas_imprimir_obtener, {
+            in_sucursal: 'velora'
+        }, {
+            timeout: 10000 // 10 segundos
+        });
+
+        if (resp1.data.res_status == 'E') throw new Error('error al consultar URL resp1 ' + resp1.data.message) 
+        if (resp.data.res_status === 'E') throw new Error('Error al consultar URL: ' + resp.data.message);
+        
+        if (resp1.data.res_status == 'S' && resp1.data.message == 'no_existen_registros') {
+            console.log("⏭️ No hay órdenes de impresión pendientes.");
+            shouldPrint = false
+            return;
+        }
+        // Si no hay registros, no imprimir
+        if (resp.data.res_status === 'S' && resp.data.message === 'no_existen_registros') {
+            console.log("⏭️ No hay órdenes de impresión pendientes.");
+            shouldPrint = false
+            return;
+        }else {
+            shouldPrint = true
         }
 
         const data = resp.data.data;

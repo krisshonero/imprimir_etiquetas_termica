@@ -16,10 +16,6 @@ async function printTicket(content) {
 
     printer.clear();
     printer.alignCenter();
-    // Puedes personalizar el encabezado fijo
-    //printer.println("================================");
-    //printer.println("   DISTRITO URBANO   ");
-    //printer.println("================================");
     printer.println(content);
     printer.cut();
 
