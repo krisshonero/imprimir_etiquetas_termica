@@ -240,7 +240,7 @@ function generarTicket(mesa, items, pedidosIds) {
         lineasItems.push(`${nombre}${precioStr}`);
     });
 
-    const propina = Math.round(subtotal * 0.1);
+    const propina = mesa.toLowerCase().includes('auto')?0:Math.round(subtotal * 0.1);
     const total = subtotal + propina;
 
     const lineaSeparadora = '─'.repeat(ANCHO);
@@ -277,9 +277,9 @@ function generarTicket(mesa, items, pedidosIds) {
 
     
 
-    ticket += 'Sub-Total (IVA inc.): '.padStart(ANCHO - subtotalStr.length) + subtotalStr + '\n';
+    ticket += mesa.toLowerCase().includes('auto')?'':'Sub-Total (IVA inc.): '.padStart(ANCHO - subtotalStr.length) + subtotalStr + '\n';
     ticket += mesa.toLowerCase().includes('auto')?'':'Prop. sug. (10%): '.padStart(ANCHO - propinaStr.length) + propinaStr + '\n';
-    ticket += 'Total: '.padStart(ANCHO - totalStr.length) + totalStr + '\n';
+    ticket += ('Total '+(mesa.toLowerCase().includes('auto')?'(IVA inc.):':':')).padStart(ANCHO - totalStr.length) + totalStr + '\n';
 
     ticket += lineaSeparadora + '\n';
     ticket += centrar('Gracias por tu compra') + '\n';
