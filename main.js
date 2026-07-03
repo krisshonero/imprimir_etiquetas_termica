@@ -275,8 +275,10 @@ function generarTicket(mesa, items, pedidosIds) {
     const propinaStr = `$${propina}`;
     const totalStr = `$${total}`;
 
+    
+
     ticket += 'Sub-Total (IVA inc.): '.padStart(ANCHO - subtotalStr.length) + subtotalStr + '\n';
-    ticket += 'Prop. sug. (10%): '.padStart(ANCHO - propinaStr.length) + propinaStr + '\n';
+    ticket += mesa.toLowerCase().includes('auto')?'':'Prop. sug. (10%): '.padStart(ANCHO - propinaStr.length) + propinaStr + '\n';
     ticket += 'Total: '.padStart(ANCHO - totalStr.length) + totalStr + '\n';
 
     ticket += lineaSeparadora + '\n';
