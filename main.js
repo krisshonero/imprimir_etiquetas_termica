@@ -235,7 +235,7 @@ function generarTicket(mesa, items, pedidosIds) {
         const valor = parseInt(item.valor) || 0;
         subtotal += valor;
         // Nombre: máximo 22 caracteres, precio: 10 caracteres (incluyendo signo $)
-        const nombre = item.receta.substring(0, 22).padEnd(22, ' ');
+        const nombre = item.receta_nombre.substring(0, 22).padEnd(22, ' ');
         const precioStr = `$${valor}`.padStart(20, ' ');
         lineasItems.push(`${nombre}${precioStr}`);
     });
