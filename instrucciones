@@ -1,0 +1,49 @@
+Haz esto:
+
+1) Crear la carpeta de inicio automático
+mkdir -p ~/.config/autostart
+2) Crear el archivo de inicio
+
+Ejecuta:
+
+nano ~/.config/autostart/cafeteria-velora.desktop
+
+Pega exactamente esto:
+
+[Desktop Entry]
+Type=Application
+Name=Cafetería Velora
+Comment=Inicia impresión y pantallas web
+Exec=/home/distrito-urbano/Escritorio/etiquetas/imprimir_etiquetas_termica/iniciar_cafeteria.sh
+Terminal=false
+StartupNotify=false
+
+Guarda:
+
+Ctrl + O
+Enter
+Ctrl + X
+3) Dar permisos
+chmod +x ~/.config/autostart/cafeteria-velora.desktop
+4) Verifica que el archivo quedó bien
+
+Ejecuta:
+
+cat ~/.config/autostart/cafeteria-velora.desktop
+
+Debe mostrar el contenido anterior.
+
+5) Prueba reiniciando
+sudo reboot
+
+Al volver a entrar a Ubuntu debería ejecutar automáticamente:
+
+/home/distrito-urbano/Escritorio/etiquetas/imprimir_etiquetas_termica/iniciar_cafeteria.sh
+
+Un detalle importante para tu caso de cafetería: esto se ejecuta cuando el usuario inicia sesión en Ubuntu. Si quieres que el equipo encienda y quede operativo sin que nadie toque nada, también debes activar el inicio de sesión automático del usuario distrito-urbano.
+
+Puedes comprobarlo en:
+
+Configuración → Usuarios → Desbloquear → Inicio de sesión automático
+
+Después de eso, el PC debería arrancar solo y cargar las pantallas.
