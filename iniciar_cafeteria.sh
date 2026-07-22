@@ -4,8 +4,7 @@
 sleep 10
 
 # Iniciar servicio de impresión
-cd /home/distrito-urbano/Escritorio/etiquetas/imprimir_etiquetas_termica
-./iniciar.sh &
+/bin/bash /home/distrito-urbano/Escritorio/etiquetas/imprimir_etiquetas_termica/iniciar.sh >> /tmp/iniciar_sh.log 2>&1 &
 
 # Abrir web del barista
 chromium \
