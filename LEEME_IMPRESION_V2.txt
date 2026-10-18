@@ -1,0 +1,37 @@
+IMPRESIÓN DE TICKETS V2
+=======================
+
+Qué cambia
+----------
+- main_v2.js reemplaza a main.js. Consulta la cola del servidor
+  (/impresion_v2_reservar), imprime con printer.js (sin cambios) y confirma
+  cada ticket (/impresion_v2_confirmar).
+- Si un ticket falla, vuelve a la cola y se reintenta solo (hasta 5 veces).
+  En la pantalla "Pedidos del día v3" se ve el estado de cada ticket:
+  Imprimiendo / Ticket impreso / Ticket no impreso (botón Reimprimir).
+- Los registros quedan en la carpeta logs\ (un archivo por día, 30 días).
+- main.js y ejecutar.bat NO se modificaron: sirven para volver atrás.
+
+Instalación (una sola vez, en el PC de la caja)
+-----------------------------------------------
+1. Actualizar la carpeta del proyecto (git pull). No hay que instalar nada:
+   usa las mismas librerías que ya están (no correr npm install).
+2. Copiar impresion_v2.env.ejemplo como impresion_v2.env y pegar la clave
+   IMPRESION_V2_API_KEY (la misma del .env del servidor distrito_urbano).
+3. Cerrar la ventana del servicio actual (ejecutar.bat).
+4. Abrir ejecutar_v2.bat. Debe mostrar "Impresión V2 iniciada".
+5. Si el inicio automático de Windows apunta a ejecutar.bat, cambiarlo a
+   ejecutar_v2.bat.
+
+Volver atrás
+------------
+1. Cerrar ejecutar_v2.bat y abrir ejecutar.bat (servicio anterior).
+2. En distrito_urbano, public/js/admin/pedidos_dia_v3.js:
+   USAR_IMPRESION_V2 = false.
+Los dos servicios pueden quedar abiertos a la vez sin duplicar tickets
+(cada uno atiende su propia cola), pero lo recomendado es dejar solo uno.
+
+Configuración
+-------------
+config_v2.js: servidor, sucursal, nombre de este PC, intervalo.
+config.js:    impresora (printerPath), igual que antes.

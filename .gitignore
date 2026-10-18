@@ -1,1 +1,6 @@
-node_modules/
+node_modules
+
+# Impresión V2: clave, registros y estado local (no se suben)
+impresion_v2.env
+logs/
+impresos_v2.json
