@@ -4,13 +4,14 @@ IMPRESIÓN DE TICKETS V2
 Qué cambia
 ----------
 - main_v2.js reemplaza a main.js. Consulta la cola del servidor
-  (/impresion_v2_reservar), imprime con printer.js (sin cambios) y confirma
+  (/impresion_v2_reservar), imprime con printer_v2.js (igual a printer.js,
+  pero el número de pedido "N: ..." sale grande y en negrita) y confirma
   cada ticket (/impresion_v2_confirmar).
 - Si un ticket falla, vuelve a la cola y se reintenta solo (hasta 5 veces).
   En la pantalla "Pedidos del día v3" se ve el estado de cada ticket:
   Imprimiendo / Ticket impreso / Ticket no impreso (botón Reimprimir).
 - Los registros quedan en la carpeta logs\ (un archivo por día, 30 días).
-- main.js y ejecutar.bat NO se modificaron: sirven para volver atrás.
+- main.js, printer.js y ejecutar.bat NO se modificaron: sirven para volver atrás.
 
 Instalación (una sola vez, en el PC de la caja)
 -----------------------------------------------

@@ -4,7 +4,7 @@
 // Reemplaza a main.js (que se mantiene intacto para volver atrás) usando
 // la cola del servidor:
 //   1. POST /impresion_v2_reservar  -> trabajos pendientes (reservados 60 s)
-//   2. imprime cada uno con printer.js (sin cambios)
+//   2. imprime cada uno con printer_v2.js (printer.js + número destacado)
 //   3. POST /impresion_v2_confirmar -> impreso | error
 //
 // Garantías:
@@ -25,7 +25,7 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const cfg = require("./config_v2");
-const { printTicket } = require("./printer");
+const { printTicket } = require("./printer_v2"); // printer.js + número de pedido destacado
 const { generarTicket } = require("./ticket_v2");
 
 // Lee impresion_v2.env (líneas CLAVE=valor) sin librerías extra: solo se
