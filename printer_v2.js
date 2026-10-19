@@ -20,7 +20,11 @@ async function printTicket(content) {
     const printer = new ThermalPrinter({
       type: PrinterTypes.EPSON,
       interface: 'none',
-      encoding: config.encoding || 'GB18030'
+      encoding: config.encoding || 'GB18030',
+      // Tabla de caracteres explícita: es la misma que la librería termina
+      // eligiendo sola (mismos bytes impresos), pero así no escribe en consola
+      // "Encoding not recognized: 'undefined'" en cada ticket.
+      characterSet: 'PC437_USA'
     });
 
     printer.clear();
