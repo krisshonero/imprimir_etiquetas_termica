@@ -14,8 +14,9 @@ Qué cambia
 
 Instalación (una sola vez, en el PC de la caja)
 -----------------------------------------------
-1. Actualizar la carpeta del proyecto (git pull). No hay que instalar nada:
-   usa las mismas librerías que ya están (no correr npm install).
+1. Actualizar la carpeta del proyecto (git pull). NO correr npm install:
+   main_v2.js usa solo las mismas librerías que main.js (axios y
+   node-thermal-printer), que ya están instaladas.
 2. Copiar impresion_v2.env.ejemplo como impresion_v2.env y pegar la clave
    IMPRESION_V2_API_KEY (la misma del .env del servidor distrito_urbano).
 3. Cerrar la ventana del servicio actual (ejecutar.bat).

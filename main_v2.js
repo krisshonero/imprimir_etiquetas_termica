@@ -23,13 +23,27 @@
 
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, "impresion_v2.env"), quiet: true });
 const axios = require("axios");
 const cfg = require("./config_v2");
 const { printTicket } = require("./printer");
 const { generarTicket } = require("./ticket_v2");
 
-const API_KEY = process.env.IMPRESION_V2_API_KEY || "";
+// Lee impresion_v2.env (líneas CLAVE=valor) sin librerías extra: solo se
+// usan las mismas dependencias que main.js (axios y node-thermal-printer).
+function leerEnv(archivo) {
+    const valores = {};
+    try {
+        fs.readFileSync(archivo, "utf8").split(/\r?\n/).forEach(linea => {
+            const l = linea.trim();
+            if (!l || l.startsWith("#")) return;
+            const i = l.indexOf("=");
+            if (i > 0) valores[l.slice(0, i).trim()] = l.slice(i + 1).trim().replace(/^["']|["']$/g, "");
+        });
+    } catch (e) { /* sin archivo: se avisa al iniciar */ }
+    return valores;
+}
+
+const API_KEY = process.env.IMPRESION_V2_API_KEY || leerEnv(path.join(__dirname, "impresion_v2.env")).IMPRESION_V2_API_KEY || "";
 const DIR_LOGS = path.join(__dirname, "logs");
 const ARCHIVO_IMPRESOS = path.join(__dirname, "impresos_v2.json");
 const MAX_IMPRESOS = 500;
