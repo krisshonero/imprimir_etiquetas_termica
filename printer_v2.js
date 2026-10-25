@@ -5,8 +5,9 @@ const config = require("./config");
 // =====================================================================
 // printer_v2.js -- impresión del ticket V2 (main_v2.js).
 // Igual que printer.js (misma librería, misma impresora, mismo envío por
-// el recurso compartido), pero la línea "N: ..." (números de pedido) sale
-// en negrita y a doble tamaño. printer.js queda sin cambios para main.js.
+// el recurso compartido), pero las líneas "N: ..." (números de pedido) y
+// "CODIGO: ..." (código de descuento) salen en negrita y a doble tamaño.
+// printer.js queda sin cambios para main.js.
 // =====================================================================
 
 const ANCHO_DOBLE = 21;    // a doble ancho caben la mitad
@@ -30,22 +31,28 @@ async function printTicket(content) {
     printer.clear();
     printer.alignCenter();
 
-    // Se imprime en tramos: lo anterior al número, el número destacado y el resto
+    // Se imprime en tramos: texto normal y, destacadas, las líneas del
+    // número de pedido y del código de descuento
+    const destacada = (l) => l.trim().startsWith('N: ') || l.trim().startsWith('CODIGO: ');
     const lineas = String(content).split('\n');
-    const iNumero = lineas.findIndex(l => l.trim().startsWith('N: '));
-    if (iNumero === -1) {
+    if (!lineas.some(destacada)) {
       printer.println(content);
     } else {
-      printer.println(lineas.slice(0, iNumero).join('\n'));
-      const numero = lineas[iNumero].trim();
-      printer.bold(true);
-      // Doble alto y ancho si cabe en una línea; si no, solo doble alto
-      if (numero.length <= ANCHO_DOBLE) printer.setTextQuadArea();
-      else printer.setTextDoubleHeight();
-      printer.println(numero); // si no cabe, la impresora sigue en la línea siguiente
-      printer.setTextNormal();
-      printer.bold(false);
-      printer.println(lineas.slice(iNumero + 1).join('\n'));
+      let tramo = [];
+      const imprimirTramo = () => { if (tramo.length) printer.println(tramo.join('\n')); tramo = []; };
+      lineas.forEach(l => {
+        if (!destacada(l)) { tramo.push(l); return; }
+        imprimirTramo();
+        const linea = l.trim();
+        printer.bold(true);
+        // Doble alto y ancho si cabe en una línea; si no, solo doble alto
+        if (linea.length <= ANCHO_DOBLE) printer.setTextQuadArea();
+        else printer.setTextDoubleHeight();
+        printer.println(linea); // si no cabe, la impresora sigue en la línea siguiente
+        printer.setTextNormal();
+        printer.bold(false);
+      });
+      imprimirTramo();
     }
     printer.cut();
 

@@ -150,7 +150,7 @@ async function procesar(trabajo) {
             .sort((a, b) => (a.id_pedido - b.id_pedido) || (a.id_item - b.id_item));
         if (!items.length) throw new Error("ticket sin productos");
         const pedidos = (Array.isArray(c.pedidos) ? c.pedidos : []).slice().sort((a, b) => a - b);
-        texto = generarTicket(String(c.mesa_nombre || c.mesa || "Mesa"), items, pedidos);
+        texto = generarTicket(String(c.mesa_nombre || c.mesa || "Mesa"), items, pedidos, c.descuento || null);
     } catch (e) {
         log("ERROR", `Ticket #${id}: contenido inválido (${e.message}).`);
         await confirmar(trabajo, "error", `contenido inválido: ${e.message}`);
